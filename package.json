@@ -1,0 +1,17 @@
+{
+  "name": "ai-magic-store",
+  "version": "1.0.0",
+  "description": "一念的AI魔法便利店",
+  "main": "index.html",
+  "scripts": {
+    "build": "node env-plugin.js",
+    "start": "npx serve .",
+    "vercel-build": "node env-plugin.js"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

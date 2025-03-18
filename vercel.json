@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "env": {
+    "LEANCLOUD_APP_ID": "LEANCLOUD_APP_ID",
+    "LEANCLOUD_APP_KEY": "LEANCLOUD_APP_KEY",
+    "LEANCLOUD_SERVER_URL": "LEANCLOUD_SERVER_URL",
+    "ADMIN_USERNAME": "ADMIN_USERNAME",
+    "ADMIN_PASSWORD": "ADMIN_PASSWORD",
+    "HELP_CONTACT": "HELP_CONTACT"
+  },
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "outputDirectory": ".",
+  "github": {
+    "silent": true
+  }
+} 

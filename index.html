@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一念的AI魔法便利店</title>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <!-- 环境变量配置 -->
+    <script src="env-config.js"></script>
+    <!-- LeanCloud SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-text">一念的AI魔法便利店</div>
+                <div class="logo-particles"></div>
+            </div>
+            <div class="header-actions">
+                <button id="adminLoginBtn"><i class="fas fa-user-shield"></i> 管理员登录</button>
+                <button id="helpStationBtn"><i class="fas fa-life-ring"></i> UP急救站</button>
+            </div>
+        </header>
+
+        <div class="category-filter">
+            <button class="category-btn active" data-category="all">全部</button>
+            <!-- 分类按钮将通过JavaScript动态生成 -->
+        </div>
+
+        <main class="links-container">
+            <!-- 链接卡片将通过JavaScript动态生成 -->
+            <div class="loading-animation">
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="slogan-showcase">
+                <div class="slogan-container">
+                    <div class="slogan-text">
+                        <span id="current-slogan">探索AI的无限可能，引领未来科技新时代</span>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 一念知识导航 | 版权所有</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 管理员登录模态框 -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>管理员登录</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn-primary">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 管理面板模态框 -->
+    <div id="adminPanelModal" class="modal">
+        <div class="modal-content admin-panel">
+            <span class="close">&times;</span>
+            <h2>链接管理</h2>
+            <div class="admin-actions">
+                <button id="logoutBtn" class="btn-admin"><i class="fas fa-sign-out-alt"></i> 退出登录</button>
+                <button id="addLinkBtn" class="btn-admin"><i class="fas fa-plus"></i> 添加新链接</button>
+                <button id="editSloganBtn" class="btn-admin"><i class="fas fa-edit"></i> 文案编辑</button>
+                <button id="editHelpStationBtn" class="btn-admin"><i class="fas fa-ambulance"></i> 编辑急救站</button>
+            </div>
+            
+            <div class="admin-links-container">
+                <!-- 管理员链接列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑链接模态框 -->
+    <div id="linkFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="linkFormTitle">添加新链接</h2>
+            <form id="linkForm">
+                <input type="hidden" id="linkId">
+                <div class="form-group">
+                    <label for="linkTitle">标题</label>
+                    <input type="text" id="linkTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkUrl">URL</label>
+                    <input type="url" id="linkUrl" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkCategory">分类</label>
+                    <input type="text" id="linkCategory" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkCredential">访问凭证</label>
+                    <input type="text" id="linkCredential" placeholder="留空则无需凭证">
+                </div>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="linkVisible" checked>
+                    <label for="linkVisible">显示链接</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">保存</button>
+                    <button type="button" class="btn-secondary" id="cancelLinkForm">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 链接点击确认模态框 -->
+    <div id="confirmLinkModal" class="modal">
+        <div class="modal-content confirm-link">
+            <h2>感谢您的支持！</h2>
+            <p>您的每一个点赞、收藏和转发，都是我持续创作的动力！</p>
+            <div id="credentialSection" style="display: none;">
+                <p>请输入共享密钥，开启AI之旅</p>
+                <div class="form-group">
+                    <input type="text" id="userCredential" placeholder="请输入访问凭证">
+                </div>
+            </div>
+            <div class="confirm-actions">
+                <button id="confirmLinkBtn" class="btn-primary">好，我来啦!</button>
+                <button id="cancelLinkBtn" class="btn-secondary">再想想</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文案编辑模态框 -->
+    <div id="sloganFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>编辑文案</h2>
+            <form id="sloganForm">
+                <div class="form-group">
+                    <label for="sloganText">文案内容</label>
+                    <textarea id="sloganText" rows="4" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">保存</button>
+                    <button type="button" class="btn-secondary" id="cancelSloganForm">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- UP急救站模态框 -->
+    <div id="helpStationModal" class="modal">
+        <div class="modal-content help-station">
+            <span class="close">&times;</span>
+            <h2>UP急救站</h2>
+            <div id="helpStationContent">
+                <p>看了视频和文档还是搞不定？UP给你远程指导！</p>
+                <p class="help-contact">带价微信咨询：<strong id="contactInfo"></strong></p>
+                <p class="help-note">不一定接！平时忙成狗，见谅！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- UP急救站编辑模态框 -->
+    <div id="helpStationFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>编辑急救站文案</h2>
+            <form id="helpStationForm">
+                <div class="form-group">
+                    <label for="helpTitle">标题</label>
+                    <textarea id="helpTitle" rows="1" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="helpContent">主要内容</label>
+                    <textarea id="helpContent" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="helpContact">联系方式</label>
+                    <textarea id="helpContact" rows="1" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="helpNote">备注</label>
+                    <textarea id="helpNote" rows="2" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">保存</button>
+                    <button type="button" class="btn-secondary" id="cancelHelpStationForm">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
